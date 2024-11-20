@@ -11,6 +11,7 @@
 */
 #include "Stepper.h"
 #include <stdlib.h>
+#include <project.h>
 
 void Stepper_init(Stepper* motor, int number_of_steps){
   motor->step_number = 0;    // which step the motor is on
@@ -22,8 +23,7 @@ void Stepper_init(Stepper* motor, int number_of_steps){
 /*
  * Sets the speed in revs per minute
  */
-void setSpeed(Stepper *motor, long whatSpeed)
-{
+void setSpeed(Stepper *motor, long whatSpeed){
   motor->step_delay = 60L * 1000L * 1000L / motor->number_of_steps / whatSpeed;
 }
 
@@ -40,39 +40,31 @@ void step(Stepper* motor, int steps_to_move){
 
 
   // decrement the number of steps, moving one step each time:
-  while (steps_left > 0)
-  {
-    unsigned long now = micros();
+  while (steps_left > 0){ 
+    
+    unsigned long now = Timer_1_ReadCounter();
     // move only if the appropriate delay has passed:
-    if (now - this->last_step_time >= this->step_delay)
-    {
+    if (now - motor->last_step_time >= motor->step_delay){
       // get the timeStamp of when you stepped:
-      this->last_step_time = now;
+      motor->last_step_time = now;
       // increment or decrement the step number,
       // depending on direction:
-      if (this->direction == 1)
-      {
-        this->step_number++;
-        if (this->step_number == this->number_of_steps) {
-          this->step_number = 0;
+      if (motor->direction == 1){
+        motor->step_number++;
+        if (motor->step_number == motor->number_of_steps) {
+          motor->step_number = 0;
         }
-      }
-      else
-      {
-        if (this->step_number == 0) {
-          this->step_number = this->number_of_steps;
+      }else{
+        if (motor->step_number == 0) {
+          motor->step_number = motor->number_of_steps;
         }
-        this->step_number--;
+        motor->step_number--;
       }
       // decrement the steps left:
       steps_left--;
       // step the motor to step number 0, 1, ..., {3 or 10}
-      if (this->pin_count == 5)
-        stepMotor(this->step_number % 10);
-      else
-        stepMotor(this->step_number % 4);
-    } else {
-      yield();
+ 
+        stepMotor(motor->step_number % 4);
     }
   }
 }
@@ -80,138 +72,34 @@ void step(Stepper* motor, int steps_to_move){
 /*
  * Moves the motor forward or backwards.
  */
-void Stepper::stepMotor(int thisStep)
-{
-  if (this->pin_count == 2) {
-    switch (thisStep) {
-      case 0:  // 01
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, HIGH);
-      break;
-      case 1:  // 11
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, HIGH);
-      break;
-      case 2:  // 10
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, LOW);
-      break;
-      case 3:  // 00
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, LOW);
-      break;
-    }
-  }
-  if (this->pin_count == 4) {
+void stepMotor(int thisStep){
     switch (thisStep) {
       case 0:  // 1010
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, LOW);
-        digitalWrite(motor_pin_3, HIGH);
-        digitalWrite(motor_pin_4, LOW);
-      break;
+        IN1_Write(1);
+        IN2_Write(0);
+        IN3_Write(1);
+        IN4_Write(0);
+        break;
       case 1:  // 0110
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, HIGH);
-        digitalWrite(motor_pin_3, HIGH);
-        digitalWrite(motor_pin_4, LOW);
-      break;
+        IN1_Write(0);
+        IN2_Write(1);
+        IN3_Write(1);
+        IN4_Write(0);
+        break;
       case 2:  //0101
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, HIGH);
-        digitalWrite(motor_pin_3, LOW);
-        digitalWrite(motor_pin_4, HIGH);
-      break;
+        IN1_Write(0);
+        IN2_Write(1);
+        IN3_Write(0);
+        IN4_Write(1);
+        break;
       case 3:  //1001
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, LOW);
-        digitalWrite(motor_pin_3, LOW);
-        digitalWrite(motor_pin_4, HIGH);
-      break;
-    }
-  }
-
-  if (this->pin_count == 5) {
-    switch (thisStep) {
-      case 0:  // 01101
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, HIGH);
-        digitalWrite(motor_pin_3, HIGH);
-        digitalWrite(motor_pin_4, LOW);
-        digitalWrite(motor_pin_5, HIGH);
-        break;
-      case 1:  // 01001
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, HIGH);
-        digitalWrite(motor_pin_3, LOW);
-        digitalWrite(motor_pin_4, LOW);
-        digitalWrite(motor_pin_5, HIGH);
-        break;
-      case 2:  // 01011
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, HIGH);
-        digitalWrite(motor_pin_3, LOW);
-        digitalWrite(motor_pin_4, HIGH);
-        digitalWrite(motor_pin_5, HIGH);
-        break;
-      case 3:  // 01010
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, HIGH);
-        digitalWrite(motor_pin_3, LOW);
-        digitalWrite(motor_pin_4, HIGH);
-        digitalWrite(motor_pin_5, LOW);
-        break;
-      case 4:  // 11010
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, HIGH);
-        digitalWrite(motor_pin_3, LOW);
-        digitalWrite(motor_pin_4, HIGH);
-        digitalWrite(motor_pin_5, LOW);
-        break;
-      case 5:  // 10010
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, LOW);
-        digitalWrite(motor_pin_3, LOW);
-        digitalWrite(motor_pin_4, HIGH);
-        digitalWrite(motor_pin_5, LOW);
-        break;
-      case 6:  // 10110
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, LOW);
-        digitalWrite(motor_pin_3, HIGH);
-        digitalWrite(motor_pin_4, HIGH);
-        digitalWrite(motor_pin_5, LOW);
-        break;
-      case 7:  // 10100
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, LOW);
-        digitalWrite(motor_pin_3, HIGH);
-        digitalWrite(motor_pin_4, LOW);
-        digitalWrite(motor_pin_5, LOW);
-        break;
-      case 8:  // 10101
-        digitalWrite(motor_pin_1, HIGH);
-        digitalWrite(motor_pin_2, LOW);
-        digitalWrite(motor_pin_3, HIGH);
-        digitalWrite(motor_pin_4, LOW);
-        digitalWrite(motor_pin_5, HIGH);
-        break;
-      case 9:  // 00101
-        digitalWrite(motor_pin_1, LOW);
-        digitalWrite(motor_pin_2, LOW);
-        digitalWrite(motor_pin_3, HIGH);
-        digitalWrite(motor_pin_4, LOW);
-        digitalWrite(motor_pin_5, HIGH);
+        IN1_Write(1);
+        IN2_Write(0);
+        IN3_Write(0);
+        IN4_Write(1);
         break;
     }
-  }
 }
 
-/*
-  version() returns the version of the library:
-*/
-int Stepper::version(void)
-{
-  return 5;
-}
+
 /* [] END OF FILE */

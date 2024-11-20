@@ -15,16 +15,16 @@
 typedef struct {
     int number_of_steps;
     int direction;
-    int last_step_time;
+    unsigned long last_step_time;
     int step_number;
-    int step_delay;
+    unsigned long step_delay;
 } Stepper;
 
 
 void Stepper_init(Stepper*, int);
 void setSpeed(Stepper*, long);
 void step(Stepper*, int);
-void stepMotor(Stepper*, int);
+void stepMotor(int);
 
 
 /* [] END OF FILE */
