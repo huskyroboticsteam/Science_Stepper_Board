@@ -14,7 +14,8 @@
 
 int main (void)
 {
-    CyGlobalIntEnable;      /* Enable global interrupts */
+    CyGlobalIntEnable; /* Enable global interrupts */
+    
     /*
     Timer_1_Start();
     
@@ -33,8 +34,6 @@ int main (void)
     */
     
     for(;;){
-        Timer_1_Start();
         CyDelay(1000);
-        unsigned long now = Timer_1_ReadCounter();
     }
 }

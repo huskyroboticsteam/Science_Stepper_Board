@@ -22,9 +22,12 @@ typedef struct {
 
 
 void Stepper_init(Stepper*, int);
+void Timer_Handeler();
 void setSpeed(Stepper*, long);
 void step(Stepper*, int);
 void stepMotor(int);
+
+CY_ISR(isr_1_Handler);
 
 
 /* [] END OF FILE */

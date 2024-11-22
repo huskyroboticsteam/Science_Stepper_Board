@@ -13,11 +13,17 @@
 #include <stdlib.h>
 #include <project.h>
 
+volatile unsigned long curr_time = 0;
+
+
+
 void Stepper_init(Stepper* motor, int number_of_steps){
   motor->step_number = 0;    // which step the motor is on
   motor->direction = 0;      // motor direction
   motor->last_step_time = 0; // timestamp in us of the last step taken
   motor->number_of_steps = number_of_steps; // total number of steps for this motor
+  //Timer_1_Start();
+  //isr_1_StartEx(isr_1__Handler);
 }
 
 /*
