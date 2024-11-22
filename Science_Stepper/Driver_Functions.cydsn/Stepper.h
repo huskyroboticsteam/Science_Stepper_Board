@@ -10,6 +10,8 @@
  * ========================================
 */
 
+
+#include <project.h>
 #pragma once
 
 typedef struct {
@@ -21,8 +23,7 @@ typedef struct {
 } Stepper;
 
 
-void Stepper_init(Stepper*, int);
-void Timer_Handeler();
+void Stepper_init(Stepper*, int);;
 void setSpeed(Stepper*, long);
 void step(Stepper*, int);
 void stepMotor(int);

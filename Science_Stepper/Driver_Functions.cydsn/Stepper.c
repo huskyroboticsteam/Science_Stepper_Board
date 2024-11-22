@@ -22,10 +22,14 @@ void Stepper_init(Stepper* motor, int number_of_steps){
   motor->direction = 0;      // motor direction
   motor->last_step_time = 0; // timestamp in us of the last step taken
   motor->number_of_steps = number_of_steps; // total number of steps for this motor
-  //Timer_1_Start();
-  //isr_1_StartEx(isr_1__Handler);
+  Timer_1_Start();
+  isr_1_StartEx(isr_1_Handler);
+  
 }
 
+CY_ISR(isr_1_Handler){
+    curr_time++;
+}
 /*
  * Sets the speed in revs per minute
  */

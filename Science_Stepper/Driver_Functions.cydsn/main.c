@@ -15,7 +15,7 @@
 int main (void)
 {
     CyGlobalIntEnable; /* Enable global interrupts */
-    
+  
     /*
     Timer_1_Start();
     
