@@ -1,3 +1,6 @@
 [submodule "PSoC Project Template.cydsn/HindsightCAN"]
 	path = PSoC Project Template.cydsn/HindsightCAN
 	url = https://github.com/huskyroboticsteam/HindsightCAN.git
+[submodule "HindsightCAN"]
+	path = HindsightCAN
+	url = git@github.com:huskyroboticsteam/HindsightCAN.git
