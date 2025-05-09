@@ -9,8 +9,9 @@
  *
  * ========================================
 */
-#ifndef FSM
-#define FSM
+
+#pragma once
+
 
 typedef enum {
     IDLE,
@@ -18,5 +19,4 @@ typedef enum {
     DONE
 } State;
 
-#endif
 /* [] END OF FILE */

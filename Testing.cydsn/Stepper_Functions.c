@@ -9,9 +9,14 @@
  *
  * ========================================
 */
+
 #include "project.h"
 #include "Stepper_Functions.h"
 
+
+int degree_to_step(int degree) {
+    return (int)((double)(degree / DEGREES_PER_REVOLUTION) * STEPS_PER_REVOLUTION);
+}
 
 void forward_step(Motor* motor) {
     
@@ -36,8 +41,8 @@ void forward_step(Motor* motor) {
     motor->active_idx = (motor->active_idx + 1) % 4;
     
 }
-
 void backward_step(Motor* motor) {
+
     motor->vals[3 - motor->active_idx] = 1;
     
     if (motor->motor_idx == 1) {
