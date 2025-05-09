@@ -1,0 +1,3 @@
+[submodule "Testing.cydsn/HindsightCAN"]
+	path = Testing.cydsn/HindsightCAN
+	url = git@github.com:huskyroboticsteam/HindsightCAN.git
