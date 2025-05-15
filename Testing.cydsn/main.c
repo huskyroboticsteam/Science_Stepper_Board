@@ -12,27 +12,39 @@
 
 #include "project.h"
 #include "cytypes.h"
+#include <stdio.h>
+#include <stdint.h>
 
-#include "CANPacket.h"
-#include "CANScience.h"
-#include "Port.h"
+#include "HindsightCAN/CANPacket.h"
+#include "HindsightCAN/CANScience.h"
+#include "HindsightCAN/Port.h"
 
 #include "Stepper_Functions.h"
 #include "FSM.h"
 
-
+#define Print(message) DBG_UART_UartPutString(message)
 #define DEVICE_SERIAL_SCIENCE_STEPPER 0x03 // TODO: REMOVE WHEN ADDED CANSerialNumbers.h
 
+char txData[200];
+
+void Init();
+
+//CAN stuff
+CANPacket can_receive;
+CANPacket can_send;
+uint8 address = 0;
+uint16_t id = 0;
 
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
     
     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-
+    Init();
+    
     // Init CAN
-    CANPacket buffer = {0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
-    InitCAN(DEVICE_GROUP_SCIENCE, DEVICE_SERIAL_SCIENCE_STEPPER);
+    //CANPacket buffer = {0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
+    
     
     // Start Timer
     PP_Timer_Start();
@@ -51,9 +63,9 @@ int main(void)
     };
 
     // CAN intermediarys
-    int motor_idx;
-    int speed;
-    int total_steps;
+    uint8_t motor_idx;
+    uint8_t speed;
+    int16_t total_steps;
     
     // reset LEDS
     LED_ERR_Write(1);
@@ -67,24 +79,39 @@ int main(void)
             case IDLE:
                 
                 // DECODE CAN
-                if (PollAndReceiveCANPacket(&buffer) == ERROR_NONE) {
-                    
+                if (PollAndReceiveCANPacket(&can_receive) == ERROR_NONE) {
+                    sprintf(txData, "Received Packet: %x | %x | %x | %x | %x | %x |", can_receive.data[0],
+                            can_receive.data[1], can_receive.data[2], can_receive.data[3], can_receive.data[4], can_receive.data[5]);
+                    Print(txData);
                     // DECODE Motor Idx
-                    motor_idx = GetScienceStepperIDFromPacket(&buffer);
-
+                    motor_idx = GetScienceStepperIDFromPacket(&can_receive);
+                    sprintf(txData, "Motor Index: %x", motor_idx); 
+                    Print(txData);
                     // DECODE speed
-                    speed = GetStepperSpeedFromPacket(&buffer);
+                    speed = GetStepperSpeedFromPacket(&can_receive);
+                    sprintf(txData, "Motor Speed: %x", speed); 
+                    Print(txData);
                     
                     // DECODE total steps
-                    if (GetPacketID(&buffer) == ID_SCIENCE_STEPPER_TURN_ANGLE) {
-                        total_steps = degree_to_step((int)GetStepperAngleFromPacket(&buffer));
-                    } else if (GetPacketID(&buffer) == ID_SCIENCE_STEPPER_TURN_STEPS) {
-                        total_steps = GetStepperStepsFromPacket(&buffer);
+                    if (GetPacketID(&can_receive) == ID_SCIENCE_STEPPER_TURN_ANGLE) {
+                        int16_t angle = GetStepperAngleFromPacket(&can_receive);
+                        total_steps = degree_to_step((int)angle);
+                        sprintf(txData, "Turn Angle: %x \r \n", angle);
+                        Print(txData);
+                    } else if (GetPacketID(&can_receive) == ID_SCIENCE_STEPPER_TURN_STEPS) {
+                        total_steps = GetStepperStepsFromPacket(&can_receive);
+                        sprintf(txData, "Turn Steps: %x \r \n", total_steps); 
+                        Print(txData);
+               
                     } else {
                         LED_ERR_Write(0);
                         total_steps = 0;
+                        sprintf(txData, "Wrong Packet ID: %x", GetPacketID(&can_receive)); 
+                        Print(txData);
                     }
-
+                    
+                    // Check bounds!
+                    
                     motors[motor_idx - 1].remaining_steps = (total_steps > 0) ? total_steps : -1 * total_steps;
                     motors[motor_idx - 1].direction = (total_steps > 0) ? FORWARD : BACKWARD;
                     motors[motor_idx - 1].speed = (speed > 0) ? speed : DEFAULT_SPEED;
@@ -124,6 +151,16 @@ int main(void)
                 break;
         }
     }
+}
+
+void Init() {
+    address = Status_Reg_DIP_Read();
+    //address = DEVICE_SERIAL_SCIENCE_STEPPER
+    DBG_UART_Start();
+    sprintf(txData, "DG: %x, Dip Addr: %x \r\n", DEVICE_GROUP_SCIENCE, address);
+    Print(txData);
+    
+    InitCAN(DEVICE_GROUP_SCIENCE, address);
 }
 
 /* [] END OF FILE */
