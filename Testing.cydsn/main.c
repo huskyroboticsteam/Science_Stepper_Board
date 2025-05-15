@@ -77,7 +77,6 @@ int main(void)
                     
                     // DECODE total steps
                     if (GetPacketID(&buffer) == ID_SCIENCE_STEPPER_TURN_ANGLE) {
-                        degree = (int)GetStepperAngleFromPacket(&buffer);
                         total_steps = degree_to_step((int)GetStepperAngleFromPacket(&buffer));
                     } else if (GetPacketID(&buffer) == ID_SCIENCE_STEPPER_TURN_STEPS) {
                         total_steps = GetStepperStepsFromPacket(&buffer);
