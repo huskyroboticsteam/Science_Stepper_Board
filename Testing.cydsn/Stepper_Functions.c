@@ -90,16 +90,16 @@ void step_4(int vals[]) {
     Motor_4_4_Write(vals[3]);
 }
 void step_5(int vals[]) {
-    Motor_1_1_Write(vals[0]);
-    Motor_1_2_Write(vals[1]);
-    Motor_1_3_Write(vals[2]);
-    Motor_1_4_Write(vals[3]);
+    Motor_5_1_Write(vals[0]);
+    Motor_5_2_Write(vals[1]);
+    Motor_5_3_Write(vals[2]);
+    Motor_5_4_Write(vals[3]);
 }
 void step_6(int vals[]) {
-    Motor_1_1_Write(vals[0]);
-    Motor_1_2_Write(vals[1]);
-    Motor_1_3_Write(vals[2]);
-    Motor_1_4_Write(vals[3]);
+    Motor_6_1_Write(vals[0]);
+    Motor_6_2_Write(vals[1]);
+    Motor_6_3_Write(vals[2]);
+    Motor_6_4_Write(vals[3]);
 }
 
 /* [] END OF FILE */
