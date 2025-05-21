@@ -45,8 +45,8 @@ int main(void)
     // INIT UART
     char txData[200];
     DBG_UART_Start();
-    // sprintf(txData, "DG: %x, Dip Addr: %x \r\n", DEVICE_GROUP_SCIENCE, address);
-    // Print(txData);
+    sprintf(txData, "DG: %x, Dip Addr: %x \r\n", DEVICE_GROUP_SCIENCE, address);
+    Print(txData);
     
     // INIT TIMER
     PP_Timer_Start();
