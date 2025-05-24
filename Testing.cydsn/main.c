@@ -86,15 +86,33 @@ int main(void)
                             can_receive.data[1], can_receive.data[2], can_receive.data[3], can_receive.data[4], can_receive.data[5]);
                     Print(txData);
                     
+                    LED_ERR_Write(1);
+                    
                     // DECODE Motor Idx
                     motor_idx = GetScienceStepperIDFromPacket(&can_receive);
-                    sprintf(txData, "Motor Index: %d ", motor_idx); 
-                    Print(txData);
+                    if (motor_idx < 1 || motor_idx > 6) {
+                        LED_ERR_Write(0);
+                        sprintf(txData, "Motor Index Not Valid: %d, Aborting", motor_idx);
+                        Print(txData);
+                        // Send CAN ERROR PACKET ?
+                        stepper_driver_state = IP;
+                        break;
+                    } else {
+                        sprintf(txData, "Motor Index: %d ", motor_idx); 
+                        Print(txData);
+                    }
                     
                     // DECODE speed
                     speed = GetStepperSpeedFromPacket(&can_receive);
-                    sprintf(txData, "Motor Speed: %d ", speed); 
-                    Print(txData);
+                    if (speed < 0) {
+                        LED_ERR_Write(0);
+                        sprintf(txData, "Motor Speed: %d can't be less then 0, using DEFAULT_SPEED: %d ", speed, DEFAULT_SPEED); 
+                        Print(txData);
+                        
+                    } else {
+                        sprintf(txData, "Motor Speed: %d ", speed); 
+                        Print(txData);
+                    }
                     
                     // DECODE total steps
                     if (GetPacketID(&can_receive) == ID_SCIENCE_STEPPER_TURN_ANGLE) {
@@ -114,16 +132,12 @@ int main(void)
                         Print(txData);
                     }
                     
-                    // Check bounds!
-                    
                     motors[motor_idx - 1].last_tick_time = PP_Timer_ReadCounter();
                     motors[motor_idx - 1].active_idx = 0;
                     motors[motor_idx - 1].vals[0] = 0;
                     motors[motor_idx - 1].vals[1] = 0;
                     motors[motor_idx - 1].vals[2] = 0;
                     motors[motor_idx - 1].vals[3] = 0;
-                    
-                    
                     
                     motors[motor_idx - 1].remaining_steps = (total_steps > 0) ? total_steps : -1 * total_steps;
                     motors[motor_idx - 1].direction = (total_steps > 0) ? FORWARD : BACKWARD;
