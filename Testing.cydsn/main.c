@@ -24,7 +24,7 @@
 
 #define Print(message) DBG_UART_UartPutString(message)
 
-#define DEVICE_SERIAL_SCIENCE_STEPPER 0x03 // TODO: REMOVE WHEN ADDED CANSerialNumbers.h
+#define DEVICE_SERIAL_SCIENCE_STEPPER 0x04 // TODO: REMOVE WHEN ADDED CANSerialNumbers.h
 
 int main(void)
 {
